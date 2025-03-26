@@ -1,0 +1,156 @@
+* {
+    border: none;
+    min-height: 0;
+    font-family: 'FiraCode Nerd Font', Georgia, serif;
+    font-weight: 500;
+    font-size: 14px;
+    padding: 0;
+    color: #DCD7BA;
+}
+
+window#waybar {
+    background: #1f1f28;
+    border: 2px solid #223249;
+    border-radius: 4px;
+}
+
+tooltip {
+    background-color: #6A9589;
+    border: 2px solid #223249;
+    font-size: 2px;
+}
+
+tooltip label {
+    margin: 8px;
+    color: #DCD7BA;
+}
+
+#clock,
+#tray,
+#cpu,
+#memory,
+#battery,
+#network,
+#backlight,
+#wireplumber {
+    margin: 6px;
+    padding: 2px;
+    border-radius: 4px;
+}
+
+#workspaces {
+        margin: 6px 0px 6px 6px;
+        border-radius: 4px;
+}
+
+#workspaces button {
+    all: initial;
+    min-width: 0;
+    box-shadow: inset 0 -3px transparent;
+    padding: 2px 4px;
+    color: #DCD7BA;
+    background-color: #6A9589;
+    border: 2px solid #223249; 
+    border-radius: 4px;
+    margin-right: 2px;
+}
+
+#workspaces button.active {
+    color: #7AA89F;
+    background-color: #6A9589;
+}
+
+#workspaces button.urgent {
+    background-color: #FF9E3B;
+	color: #FF9E3B;
+	border: 2px solid #49443C;
+}
+
+#clock {
+    background-color: #223249;
+    border: 2px solid #353146;
+    color: #DCD7BA;
+}
+
+#cpu,
+#memory,
+#network,
+#wireplumber,
+#battery,
+#backlight,
+#tray,
+#language {
+    background-color: #353146;
+    border: 2px solid #223249;
+    color: #DCD7BA;
+}
+
+#network {
+	min-width: 100px;
+}
+
+#cpu,
+#memory,
+#battery,
+#wireplumber{
+	min-width: 60px;
+}
+
+#cpu.critical,
+#memory.critical {
+    color: #e82424;
+    border: 2px solid #e82424;
+}
+
+#battery.warning,
+#battery.critical,
+#battery.urgent {
+    color: #e82424;
+    border: 2px solid #e82424;
+}
+
+
+#wireplumber.muted {
+    color: #e82424;
+    border: 2px solid #e82424;
+}
+
+#tags button {
+	background-color: #223249;
+	border: 1px solid #353146;
+	color: #DCD7BA;
+    margin-top: 6px;
+    margin-bottom: 6px;
+    padding-right: 12px;
+    padding-left: 6px;
+    border-radius: 0;
+}
+
+#tags button.occupied {
+    text-decoration: underline;
+}
+
+#tags button.focused {
+	background-color: #6A9589;
+	color: #DCD7BA;
+}
+
+#tags button.urgent {
+	background-color: #e82424;
+	color: #e82424;
+	border: 1px solid #49443C;
+}
+
+#window {
+    margin: 6px;
+    padding-right: 6px;
+    padding-left: 6px;
+}
+
+#window.focused {
+    padding: 4px;
+    background-color: #FFA066;
+    border: 2px solid #223249;
+    color: #223249;
+    border-radius: 4px;
+}
