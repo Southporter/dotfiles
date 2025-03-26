@@ -1,22 +1,42 @@
 const std = @import("std");
 const builtin = @import("builtin");
 
+const log = std.log.scoped(.river_init);
+
 fn run(args: []const []const u8, alloc: std.mem.Allocator) !void {
-    const process = std.process.Child.init(args, alloc);
-    const result = process.wait();
-    if (result.Status != std.os.ProcessStatus.Exited) {
-        return std.debug.panic("Process did not exit cleanly\n");
-    }
-    if (result.ExitCode != 0) {
-        return std.debug.panic("Process exited with code {}\n", .{result.ExitCode});
+    var process = std.process.Child.init(args, alloc);
+    const result = try process.spawnAndWait();
+    log.info("Command exited with status {any}", .{result});
+    switch (result) {
+        .Exited => |code| {
+            if (code != 0) {
+                log.err("Command failed with exit code {d}", .{code});
+                for (args) |arg| {
+                    log.err("    arg: {s}", .{arg});
+                }
+                return error.CommandFailed;
+            }
+        },
+        else => {
+            log.err("Command failed with status {any}", .{result});
+            return error.CommandFailed;
+        },
     }
 }
 
 // fn autostart(alloc: std.mem.Allocator) !void {}
 
-fn wrapCommand(subcommand: enum { spawn, @"send-layout-command", move, resize, map }, comptime cmd: []const []const u8) []const []const u8 {
+const RiverctlCommand = enum {
+    spawn,
+    @"send-layout-command",
+    move,
+    resize,
+    map,
+    @"map-pointer",
+};
+fn wrapCommand(subcommand: RiverctlCommand, cmd: []const []const u8, alloc: std.mem.Allocator) ![]const []const u8 {
     const new_len = cmd.len + 2;
-    var new_cmd: [new_len][]const u8 = undefined;
+    var new_cmd = try alloc.alloc([]const u8, new_len);
     new_cmd[0] = "riverctl";
     new_cmd[1] = @tagName(subcommand);
     for (cmd, 0..) |arg, i| {
@@ -35,25 +55,27 @@ pub fn keymap(alloc: std.mem.Allocator) !void {
         for (km.cmd, 0..) |cmd, i| {
             buf[i + 3] = cmd;
         }
-        const cmd = wrapCommand(.map, buf);
+        const cmd = try wrapCommand(.map, buf[0..km.cmd.len], alloc);
+        defer alloc.free(cmd);
         try run(cmd, alloc);
     }
     for (pointermap) |pm| {
         buf[0] = @tagName(pm.mode);
         buf[1] = mod(pm.mods, &char_buf);
-        buf[2] = @tagName(pm.button);
+        buf[2] = @tagName(pm.key);
         for (pm.cmd, 0..) |cmd, i| {
             buf[i + 3] = cmd;
         }
-        const cmd = wrapCommand(.@"map-pointer", buf);
+        const cmd = try wrapCommand(.@"map-pointer", buf[0 .. pm.cmd.len + 3], alloc);
+        defer alloc.free(cmd);
         try run(cmd, alloc);
     }
 }
 fn mod(mods: []const Mod, buf: []u8) []const u8 {
     return switch (mods.len) {
         1 => @tagName(mods[0]),
-        2 => std.fmt.bufPrint(buf, "{s}+{s}", .{ @tagName(mods[0]), @tagName(mods[1]) }),
-        3 => std.fmt.bufPrint(buf, "{s}+{s}+{s}", .{ @tagName(mods[0]), @tagName(mods[1]), @tagName(mods[2]) }),
+        2 => std.fmt.bufPrint(buf, "{s}+{s}", .{ @tagName(mods[0]), @tagName(mods[1]) }) catch unreachable,
+        3 => std.fmt.bufPrint(buf, "{s}+{s}+{s}", .{ @tagName(mods[0]), @tagName(mods[1]), @tagName(mods[2]) }) catch unreachable,
         // only a maximum of 3 modifiers are supported
         else => unreachable,
     };
@@ -143,7 +165,7 @@ const keymaps = [_]Keymap{
     // Toggle float
 } ++ tagMaps();
 
-fn tagMaps() []Keymap {
+fn tagMaps() [9 * 4]Keymap {
     var tagmaps: [9 * 4]Keymap = undefined;
     for (0..9) |num| {
         const offset = num * 4;
@@ -177,9 +199,9 @@ fn tagMaps() []Keymap {
 }
 
 const pointermap = [_]Keymap{
-    .{ .mode = .normal, .mods = &.{.Super}, .button = .BTN_LEFT, .cmd = &.{"move-view"} },
-    .{ .mode = .normal, .mods = &.{.Super}, .button = .BTN_RIGHT, .cmd = &.{"resize-view"} },
-    .{ .mode = .normal, .mods = &.{.Super}, .button = .BTN_MIDDLE, .cmd = &.{"toggle-float"} },
+    .{ .mode = .normal, .mods = &.{.Super}, .key = .BTN_LEFT, .cmd = &.{"move-view"} },
+    .{ .mode = .normal, .mods = &.{.Super}, .key = .BTN_RIGHT, .cmd = &.{"resize-view"} },
+    .{ .mode = .normal, .mods = &.{.Super}, .key = .BTN_MIDDLE, .cmd = &.{"toggle-float"} },
 };
 
 pub fn main() !void {
