@@ -1,0 +1,4 @@
+timeout 120 'swaylock -f -i ~/Pictures/Backgrounds/milkyway.jpg'
+timeout 600 '~/.config/river/screen-mgmt off' resume '~/.config/river/screen-mgmt on'
+before-sleep 'swaylock -f -i ~/Pictures/Backgrounds/milkyway.jpg'
+lock 'swaylock -f -i ~/Pictures/Backgrounds/milkyway.jpg'

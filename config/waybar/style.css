@@ -32,9 +32,11 @@ tooltip label {
 #battery,
 #network,
 #backlight,
+#bluetooth,
 #wireplumber {
-    margin: 6px;
-    padding: 2px;
+    margin-top: 6px;
+    margin-bottom: 6px;
+    padding: 2px 4px;
     border-radius: 4px;
 }
 
@@ -76,6 +78,7 @@ tooltip label {
 #memory,
 #network,
 #wireplumber,
+#bluetooth,
 #battery,
 #backlight,
 #tray,
@@ -86,14 +89,15 @@ tooltip label {
 }
 
 #network {
-	min-width: 100px;
+	min-width: 64px;
 }
 
 #cpu,
 #memory,
 #battery,
+#bluetooth,
 #wireplumber{
-	min-width: 60px;
+	min-width: 40px;
 }
 
 #cpu.critical,
@@ -148,9 +152,28 @@ tooltip label {
 }
 
 #window.focused {
-    padding: 4px;
+    padding: 2px 4px;
     background-color: #FFA066;
     border: 2px solid #223249;
     color: #223249;
+    border-radius: 4px;
+}
+
+
+#tray menu {
+    background-color: #353146;
+    border: 2px solid #223249;
+    color: #DCD7BA;
+    margin-top: 6px;
+}
+#idle_inhibitor {
+    margin-top: 6px;
+    margin-bottom: 6px;
+    padding-left: 4px;
+}
+#idle_inhibitor.activated {
+    background-color: #ffa066;
+    color: #1f1f28;
+    border: 2px solid #223249;
     border-radius: 4px;
 }

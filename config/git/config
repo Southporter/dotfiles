@@ -1,0 +1,18 @@
+[commit]
+	; gpgsign = true
+
+[alias]
+	co = checkout
+	s = status
+	pfl = push --force-with-lease
+[user]
+	email = shem.sedrick@caylent.com
+	name = Shem Sedrick
+[push]
+	autoSetupRemote = true
+[diff]
+	algorithm = histogram
+[merge]
+	conflictstyle = zdiff3
+[init]
+	defaultBranch = master

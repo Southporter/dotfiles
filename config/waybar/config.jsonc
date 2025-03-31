@@ -1,23 +1,24 @@
 {
     "layer": "top",
     "position": "top",
-    "height": 32,
+    "height": 38,
     "modules-left": [
         "custom/launcher",
-        "tray"
+        "idle_inhibitor",
+        "tray",
+        "river/window",
     ],
     "modules-center": [
-        "river/window",
         "river/tags"
     ],
     "modules-right": [
-        "backlight",
-        "clock",
+        "bluetooth",
         "wireplumber",
         "battery",
         "memory",
         "cpu",
         "network",
+        "clock",
         "custom/power"
     ],
    "river/tags": {
@@ -45,6 +46,11 @@
     "on-click": "helvum",
     "format-icons": ["", "", ""]
 },
+  "bluetooth": {
+    "format-connected": " ",
+    "format-on": " 󰟩",
+    "on-click-right": "bluedevil-wizard",
+  },
   "cpu": {
     "format": " {}%",
     "on-click": "ghostty -e btop"
@@ -83,9 +89,8 @@
       "on-scroll-up": "shift_up",
       "on-scroll-down": "shift_down"
     },
-    "format": "  {:%a %d %b  %I:%M %p}", //12 hour format
-    // "format": " {:%d %m %Y  %H:%M}",	//24 hour format
-    "format-alt": "  {:%d/%m/%Y  %H:%M}",
+    "format": " {:%d/%m  %I:%M %p}", //12 hour format
+    "format-alt": " {:%d/%m/%Y  %H:%M}",
     // //"max-length": 200
     "interval": 1
   },
@@ -99,4 +104,11 @@
     "on-click": "fuzzel",
     "tooltip": false
   },
+  "idle_inhibitor": {
+    "format": "{icon} ",
+    "format-icons": {
+        "activated": "󰒳",
+        "deactivated": "󰒲",
+    }
+  }
 }
