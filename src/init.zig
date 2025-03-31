@@ -129,6 +129,7 @@ const Key = enum(u16) {
     XF86Eject, XF86AudioRaiseVolume, XF86AudioLowerVolume,
     XF86AudioMute, XF86AudioMicMute, XF86AudioStop,
     XF86AudioPause, XF86AudioPlay, XF86AudioPrev,
+    XF86AudioMedia,
     XF86AudioNext, XF86MonBrightnessUp, XF86MonBrightnessDown,
     BTN_LEFT, BTN_MIDDLE, BTN_RIGHT, F11,
     // zig fmt: on
@@ -207,7 +208,7 @@ const keymaps = [_]Keymap{
 
     // Super+D to run fuzzel
     .{ .mode = .normal, .mods = &.{.Super}, .key = .D, .cmd = &.{ "spawn", "fuzzel" } },
-} ++ tagMaps();
+} ++ tagMaps() ++ mediaKeys(.normal) ++ mediaKeys(.locked);
 
 fn tagMaps() [9 * 4]Keymap {
     var tagmaps: [9 * 4]Keymap = undefined;
@@ -240,6 +241,22 @@ fn tagMaps() [9 * 4]Keymap {
         };
     }
     return tagmaps;
+}
+fn mediaKeys(mode: Mode) [9]Keymap {
+    const keys = [_]Keymap{
+        .{ .mode = mode, .mods = &.{}, .key = .XF86AudioRaiseVolume, .cmd = &.{ "spawn", "wpctl @DEFAULT_AUDIO_SINK@ 5%+" } },
+        .{ .mode = mode, .mods = &.{}, .key = .XF86AudioLowerVolume, .cmd = &.{ "spawn", "wpctl @DEFAULT_AUDIO_SINK@ 5%-" } },
+        .{ .mode = mode, .mods = &.{}, .key = .XF86AudioMute, .cmd = &.{ "spawn", "wpctl @DEFAULT_AUDIO_SINK@ 0%" } },
+
+        .{ .mode = mode, .mods = &.{}, .key = .XF86AudioMedia, .cmd = &.{ "spawn", "playerctl play-pause" } },
+        .{ .mode = mode, .mods = &.{}, .key = .XF86AudioPlay, .cmd = &.{ "spawn", "playerctl play-pause" } },
+        .{ .mode = mode, .mods = &.{}, .key = .XF86AudioPrev, .cmd = &.{ "spawn", "playerctl previous" } },
+        .{ .mode = mode, .mods = &.{}, .key = .XF86AudioNext, .cmd = &.{ "spawn", "playerctl next" } },
+
+        .{ .mode = mode, .mods = &.{}, .key = .XF86MonBrightnessUp, .cmd = &.{ "spawn", "brightnessctl set 5%+" } },
+        .{ .mode = mode, .mods = &.{}, .key = .XF86MonBrightnessDown, .cmd = &.{ "spawn", "brightnessctl set 5%-" } },
+    };
+    return keys;
 }
 
 const pointermap = [_]Keymap{
