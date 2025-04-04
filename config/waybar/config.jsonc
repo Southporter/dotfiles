@@ -50,14 +50,17 @@
     "format-connected": " ",
     "format-on": " 󰟩",
     "on-click-right": "bluedevil-wizard",
+    "tooltip-format": "{device_enumerate}",
+    "tooltip-format-enumerate-connected": "{device_alias}",
+    "tooltip-format-enumerate-connected-battery": "{device_alias}\t{device_battery_percentage}%",
   },
   "cpu": {
     "format": " {}%",
-    "on-click": "ghostty -e btop"
+    "on-click": "ghostty --window-decoration=false -e btop"
   },
   "memory": {
-    "format": " {}%",
-    "on-click": "ghostty -e btop"
+    "format": " {}%",
+    "on-click": "ghostty --window-decoration=false -e btop"
   },  "battery": {
     "states": {
       "warning": 30,
@@ -110,5 +113,16 @@
         "activated": "󰒳",
         "deactivated": "󰒲",
     }
+  },
+  "network": {
+    "format": "{icon}",
+    "format-icons": {
+      "ethernet": "",
+      "wifi": "",
+      "disconnected": "󰲛",
+    },
+    "tooltip-format-ethernet":  "{icon} {ipaddr} {bandwidthUpBits} {bandwidthDownBits}",
+    "tooltip-format-wifi": "{icon} {essid} {frequency} {bandwidthUpBits} {bandwidthDownBits}",
+    "tooltip-format-disconnected": "Disconnected"
   }
 }

@@ -89,15 +89,17 @@ tooltip label {
 }
 
 #network {
-	min-width: 64px;
+	min-width: 32px;
 }
 
-#cpu,
 #memory,
 #battery,
 #bluetooth,
 #wireplumber{
 	min-width: 40px;
+}
+#cpu {
+    min-width: 64px;
 }
 
 #cpu.critical,

@@ -3,12 +3,37 @@ const builtin = @import("builtin");
 
 const log = std.log.scoped(.river_init);
 
-fn run(args: []const []const u8, alloc: std.mem.Allocator) !void {
-    std.debug.print("Running '", .{});
-    for (args) |arg| {
-        std.debug.print("{s} ", .{arg});
+pub const std_options = std.Options{
+    .logFn = logFn,
+};
+
+var logFile: ?*std.fs.File = null;
+
+pub fn logFn(
+    comptime level: std.log.Level,
+    comptime scope: @Type(.enum_literal),
+    comptime format: []const u8,
+    args: anytype,
+) void {
+    // Ignore all non-error logging from sources other than
+    // .my_project, .nice_library and the default
+    const scope_prefix = "(" ++
+        @tagName(scope) ++ "): ";
+
+    const prefix = "[" ++ comptime level.asText() ++ "] " ++ scope_prefix;
+
+    if (logFile) |file| {
+
+        // Print the message to stderr, silently ignoring any errors
+        std.debug.lockStdErr();
+        defer std.debug.unlockStdErr();
+        const stderr = file.writer();
+        nosuspend stderr.print(prefix ++ format ++ "\n", args) catch return;
     }
-    std.debug.print("'\n", .{});
+}
+
+fn run(args: []const []const u8, alloc: std.mem.Allocator) !void {
+    log.debug("Running '{s}'", .{args});
     const process = try std.process.Child.run(.{
         .allocator = alloc,
         .argv = args,
@@ -86,7 +111,9 @@ pub fn keymap(alloc: std.mem.Allocator) !void {
         }
         const cmd = try wrapCommand(.map, buf[0 .. km.cmd.len + 3], alloc);
         defer alloc.free(cmd);
-        try run(cmd, alloc);
+        run(cmd, alloc) catch |err| {
+            log.err("Run Error: {any}", .{err});
+        };
     }
     for (pointermap) |pm| {
         buf[0] = @tagName(pm.mode);
@@ -97,11 +124,14 @@ pub fn keymap(alloc: std.mem.Allocator) !void {
         }
         const cmd = try wrapCommand(.@"map-pointer", buf[0 .. pm.cmd.len + 3], alloc);
         defer alloc.free(cmd);
-        try run(cmd, alloc);
+        run(cmd, alloc) catch |err| {
+            log.err("Run Error: {any}", .{err});
+        };
     }
 }
 fn mod(mods: []const Mod, buf: []u8) []const u8 {
     return switch (mods.len) {
+        0 => "None",
         1 => @tagName(mods[0]),
         2 => std.fmt.bufPrint(buf, "{s}+{s}", .{ @tagName(mods[0]), @tagName(mods[1]) }) catch unreachable,
         3 => std.fmt.bufPrint(buf, "{s}+{s}+{s}", .{ @tagName(mods[0]), @tagName(mods[1]), @tagName(mods[2]) }) catch unreachable,
@@ -269,20 +299,32 @@ fn styleAndLayout(alloc: std.mem.Allocator) !void {
     const bg = try wrapCommand(.@"background-color", &.{"0x54546D"}, alloc);
     const border_focused = try wrapCommand(.@"border-color-focused", &.{"0x223249"}, alloc);
     const border_unfocused = try wrapCommand(.@"border-color-unfocused", &.{"0x2D4F67"}, alloc);
-    try run(bg, alloc);
-    try run(border_focused, alloc);
-    try run(border_unfocused, alloc);
+    run(bg, alloc) catch |err| {
+        log.err("Failed to set Background color: {any}", .{err});
+    };
+    run(border_focused, alloc) catch |err| {
+        log.err("Failed to set Border color focused: {any}", .{err});
+    };
+    run(border_unfocused, alloc) catch |err| {
+        log.err("Failed to set Border color unfocused: {any}", .{err});
+    };
 
     const repeat = try wrapCommand(.@"set-repeat", &.{ "50", "300" }, alloc);
-    try run(repeat, alloc);
+    run(repeat, alloc) catch |err| {
+        log.err("Failed to set repeat: {any}", .{err});
+    };
 
     const default_layout = try wrapCommand(.@"default-layout", &.{"rivertile"}, alloc);
-    try run(default_layout, alloc);
+    run(default_layout, alloc) catch |err| {
+        log.err("Failed to set default layout: {any}", .{err});
+    };
 
     const passthrough = try wrapCommand(.@"declare-mode", &.{"passthrough"}, alloc);
-    try run(passthrough, alloc);
+    run(passthrough, alloc) catch |err| {
+        log.err("Failed to set passthrough mode: {any}", .{err});
+    };
 
-    fork(&.{ "rivertile", "-view-padding", "4", "-outer-padding", "4" }, alloc);
+    fork(&.{ "rivertile", "-view-padding", "2", "-outer-padding", "2" }, alloc);
 
     const gnome_schema: []const u8 = "org.gnome.desktop.interface";
     try run(&.{ "gsettings", "set", gnome_schema, "gtk-theme", "Breeze-Dark" }, alloc);
@@ -292,13 +334,13 @@ fn styleAndLayout(alloc: std.mem.Allocator) !void {
 const riverctl_spawn = [_][]const u8{ "riverctl", "spawn" };
 const lockscreen = "~/Pictures/Backgrounds/milkyway.jpg";
 const background = "~/Pictures/Backgrounds/hawksbill_crag.jpg";
+var activation_environment = riverctl_spawn ++ .{"dbus-update-activation-environment --systemd DBUS_SESSION_BUS_ADDRESS SEATD_SOCK DISPLAY WAYLAND_DISPLAY XAUTHORITY XDG_CURRENT_DESKTOP=river"};
 var dunst = riverctl_spawn ++ .{"dunst"};
 var waybar = riverctl_spawn ++ .{"waybar"};
 var kanshi = riverctl_spawn ++ .{"kanshi"};
 var nm_applet = riverctl_spawn ++ .{"nm-applet"};
 var swayidle = riverctl_spawn ++ .{"swayidle -w"};
 var batsignal = riverctl_spawn ++ .{"batsignal -b -e -p -w 35 -c 18 -d 12 -f 85 -m 180 -D systemctl suspend"};
-var activation_environment = riverctl_spawn ++ .{"dbus-update-activation-environment --systemd DBUS_SESSION_BUS_ADDRESS SEATD_SOCK DISPLAY WAYLAND_DISPLAY XAUTHORITY XDG_CURRENT_DESKTOP=river"};
 var swaybg = riverctl_spawn ++ .{"swaybg -i " ++ background};
 
 fn autostart(alloc: std.mem.Allocator) !void {
@@ -310,10 +352,13 @@ fn autostart(alloc: std.mem.Allocator) !void {
         nm_applet[0..],
         swayidle[0..],
         batsignal[0..],
+        &swaybg,
     };
 
     for (programs) |program| {
-        try run(program, alloc);
+        run(program, alloc) catch |err| {
+            log.err("Failed to run program: {s} {any}", .{ program[2], err });
+        };
     }
 }
 
@@ -325,20 +370,24 @@ pub fn main() !void {
         }
     }
 
+    var logging = try std.fs.createFileAbsolute("/home/southporter/.local/log/river_init.log", .{
+        .truncate = true,
+        .mode = 0o640,
+    });
+    defer logging.close();
+    logFile = &logging;
+
     var arena = std.heap.ArenaAllocator.init(std.heap.page_allocator);
 
-    // autostart(arena.allocator()) catch |err| {
-    //     std.debug.print("Error: {}\n", .{err});
-    // };
-    keymap(arena.allocator()) catch |err| {
-        std.debug.print("Error: {}\n", .{err});
+    autostart(arena.allocator()) catch |err| {
+        log.err("Error: {any}", .{err});
     };
     _ = arena.reset(.retain_capacity);
-    autostart(arena.allocator()) catch |err| {
-        std.debug.print("Error: {}\n", .{err});
+    keymap(arena.allocator()) catch |err| {
+        log.err("Error: {any}", .{err});
     };
     _ = arena.reset(.retain_capacity);
     styleAndLayout(arena.allocator()) catch |err| {
-        std.debug.print("Error: {}\n", .{err});
+        log.err("Error: {any}", .{err});
     };
 }

@@ -7,5 +7,6 @@ set -x EDITOR nvim
 
 mise activate fish | source
 
-# Added by LM Studio CLI (lms)
-set -gx PATH $PATH /home/southporter/.lmstudio/bin
+
+set -x SSH_AUTH_SOCK $XDG_RUNTIME_DIR/ssh-agent.socket
+set -x SSH_AGENT_PID (pidof -s ssh-agent)
