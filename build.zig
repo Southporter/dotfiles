@@ -1,4 +1,5 @@
 const std = @import("std");
+const wl = @import("zig-wayland");
 
 pub fn build(b: *std.Build) !void {
     const target = b.standardTargetOptions(.{});

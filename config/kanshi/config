@@ -1,4 +1,4 @@
-profile laptot {
+profile laptop {
 	output eDP-1 enable scale 2
 }
 
@@ -12,4 +12,9 @@ profile workdock {
 	output eDP-1 enable scale 2 position 1920,0
 
 	output DP-8 enable scale 1 mode 1920x1080@60Hz position 0,0
+}
+profile workdock-left {
+	output eDP-1 enable scale 2 position 0,0
+
+	output DP-3 enable scale 1 mode 1920x1080@60Hz position 1450,0
 }

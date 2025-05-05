@@ -297,7 +297,7 @@ const pointermap = [_]Keymap{
 
 fn styleAndLayout(alloc: std.mem.Allocator) !void {
     const bg = try wrapCommand(.@"background-color", &.{"0x54546D"}, alloc);
-    const border_focused = try wrapCommand(.@"border-color-focused", &.{"0x223249"}, alloc);
+    const border_focused = try wrapCommand(.@"border-color-focused", &.{"0xD27E99"}, alloc);
     const border_unfocused = try wrapCommand(.@"border-color-unfocused", &.{"0x2D4F67"}, alloc);
     run(bg, alloc) catch |err| {
         log.err("Failed to set Background color: {any}", .{err});
