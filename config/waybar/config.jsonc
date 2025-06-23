@@ -56,11 +56,11 @@
   },
   "cpu": {
     "format": " {}%",
-    "on-click": "ghostty --window-decoration=false -e btop"
+    "on-click": "ghostty --window-decoration=false -e glances"
   },
   "memory": {
     "format": " {}%",
-    "on-click": "ghostty --window-decoration=false -e btop"
+    "on-click": "ghostty --window-decoration=false -e glances"
   },  "battery": {
     "states": {
       "warning": 30,
