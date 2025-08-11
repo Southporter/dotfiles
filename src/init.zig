@@ -238,6 +238,8 @@ const keymaps = [_]Keymap{
 
     // Super+D to run fuzzel
     .{ .mode = .normal, .mods = &.{.Super}, .key = .D, .cmd = &.{ "spawn", "fuzzel" } },
+    // Super+R to run krunner
+    .{ .mode = .normal, .mods = &.{.Super}, .key = .R, .cmd = &.{ "spawn", "krunner" } },
 } ++ tagMaps() ++ mediaKeys(.normal) ++ mediaKeys(.locked);
 
 fn tagMaps() [9 * 4]Keymap {
