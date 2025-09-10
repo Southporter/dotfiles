@@ -4,7 +4,7 @@ A fresh start on my dotfiles using the Zig build system.
 ## Design goals
 
 Allow for building small utilities.
-Build a [river](https://https://codeberg.org/river/river) init program using Zig.
+Build a [river](https://codeberg.org/river/river) init program using Zig.
 Allow for copying over specific program configs.
 
 And have fun doing something crazy with the Zig build system.
